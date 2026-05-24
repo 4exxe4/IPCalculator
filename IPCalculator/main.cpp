@@ -30,17 +30,22 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			DWORD dwIPaddress = 0;
 			DWORD dwIPmask = 0;
+			DWORD dwIPrefix = 0;
 			HWND hIPaddress = GetDlgItem(hwnd, IDC_IP_ADDRESS);
 			HWND hIPmask = GetDlgItem(hwnd, IDC_IP_MASK);
+			HWND hIPrefix = GetDlgItem(hwnd, IDC_EDIT_PREFIX);
 			if (HIWORD(wParam) == EN_CHANGE)
 			{
 				SendMessage(hIPaddress, IPM_GETADDRESS, 0, (LPARAM)&dwIPaddress);
 				std::cout << FIRST_IPADDRESS(dwIPaddress) << std::endl;
-				if (FIRST_IPADDRESS(dwIPaddress) < 128)dwIPmask = 0xFF000000;
-				else if (FIRST_IPADDRESS(dwIPaddress) < 192)dwIPmask = 0xFFFF0000;
-				else if (FIRST_IPADDRESS(dwIPaddress) < 224)dwIPmask = 0xFFFFFF00;
+				if (FIRST_IPADDRESS(dwIPaddress) < 128)dwIPmask = 0xFF000000, dwIPrefix = 8;
+				else if (FIRST_IPADDRESS(dwIPaddress) < 192)dwIPmask = 0xFFFF0000, dwIPrefix = 16;
+				else if (FIRST_IPADDRESS(dwIPaddress) < 224)dwIPmask = 0xFFFFFF00, dwIPrefix = 24;
 				std::cout << dwIPmask << std::endl;
 				SendMessage(hIPmask, IPM_SETADDRESS, 0, dwIPmask);
+				CHAR szIPrefix[3] = {};
+				sprintf(szIPrefix, "%i", dwIPrefix);
+				SendMessage(hIPrefix, WM_SETTEXT, 0, (LPARAM)szIPrefix);
 			}
 		}
 		break;
